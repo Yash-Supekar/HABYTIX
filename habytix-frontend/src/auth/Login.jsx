@@ -1,50 +1,99 @@
-import AuthLayout from "../layouts/AuthLayout";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export default function Login() {
-    return (
-        <AuthLayout>
-            <div className="w-full max-w-md bg-white p-8 rounded-xl shadow">
-                <h2 className="text-2xl font-semibold mb-2">Welcome back</h2>
-                <p className="text-sm text-slate-500 mb-6">
-                    Sign in to continue to Habytix
-                </p>
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-                <form className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Email</label>
-                        <input
-                            type="email"
-                            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-800"
-                            placeholder="you@example.com"
-                        />
-                    </div>
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Password</label>
-                        <input
-                            type="password"
-                            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-800"
-                            placeholder="••••••••"
-                        />
-                    </div>
+  try {
+    const response = await fetch("http://localhost:8080/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
 
-                    <button
-                        type="button"
-                        onClick={() => {
-                            localStorage.setItem("role", "TENANT");
-                            window.location.href = "/tenant/dashboard";
-                        }}
-                        className="w-full bg-slate-900 text-white py-2 rounded-lg"
-                    >
-                        Sign In (Tenant)
-                    </button>
+    if (!response.ok) {
+      throw new Error("Invalid email or password");
+    }
 
-                </form>
+    const user = await response.json();
 
-                <p className="text-sm text-center text-slate-500 mt-6">
-                    Don’t have an account? <span className="text-slate-900 font-medium cursor-pointer">Sign up</span>
-                </p>
-            </div>
-        </AuthLayout>
-    );
+    localStorage.setItem("habytixUser", JSON.stringify(user));
+
+    if (user.role === "TENANT") {
+      navigate("/tenant/dashboard");
+    } else if (user.role === "MANAGER") {
+      navigate("/manager/dashboard");
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-100">
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8"
+      >
+        <h1 className="text-2xl font-semibold text-gray-800 text-center">
+          Sign in to Habytix
+        </h1>
+        <p className="text-sm text-gray-500 text-center mt-1">
+          Manage your space, effortlessly
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label className="text-sm text-gray-600">Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-gray-600">Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white rounded-lg py-2 font-medium hover:bg-indigo-700 transition"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <p className="text-sm text-gray-500 text-center mt-6">
+          Don’t have an account?{" "}
+          <Link to="/register" className="text-indigo-600 hover:underline">
+            Register
+          </Link>
+        </p>
+      </motion.div>
+    </div>
+  );
 }

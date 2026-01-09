@@ -1,14 +1,17 @@
+import { useNavigate } from "react-router-dom";
 import TenantLayout from "../../layouts/TenantLayout";
 
 const mockProfile = {
   name: "Yash Supekar",
   email: "yash@example.com",
   phone: "+91 9876543210",
-  building: "Sunrise Apartments",
+  building: "IRIS TOWER",
   unit: "B-204",
 };
 
 export default function Profile() {
+  const navigate = useNavigate();
+
   return (
     <TenantLayout>
       <h1 className="text-2xl font-semibold mb-6">My Profile</h1>
@@ -20,7 +23,10 @@ export default function Profile() {
         <ProfileRow label="Building" value={mockProfile.building} />
         <ProfileRow label="Unit" value={mockProfile.unit} />
 
-        <button className="mt-6 bg-slate-900 text-white px-5 py-2 rounded-lg">
+        <button
+          onClick={() => navigate("/tenant/profile/edit")}
+          className="mt-6 bg-slate-900 text-white px-5 py-2 rounded-lg"
+        >
           Edit Profile
         </button>
       </div>
