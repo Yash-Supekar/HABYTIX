@@ -1,10 +1,12 @@
-# Node / React
+# Frontend (React / Vite)
 node_modules/
 dist/
 
-# Spring Boot
+# Backend (Spring Boot)
 target/
 *.log
+
+# Environment
 .env
 
 # OS
