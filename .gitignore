@@ -1,0 +1,11 @@
+# Node / React
+node_modules/
+dist/
+
+# Spring Boot
+target/
+*.log
+.env
+
+# OS
+.DS_Store
